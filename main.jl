@@ -27,7 +27,6 @@ function arctanh(x)
 end
  
 
-
 function tor_preciso(x)
     eps = 10.0^(-x)
     res = 0.5 * log(( 2 + eps )/eps)
@@ -38,15 +37,16 @@ end
 
 x = range(rp, 10*rp, step=0.1)
 y = []
+
 #=
+
 for i in x
     a = tor(i)
     push!(y,a)
 end
-
 plot(x, y, origin = true, xlabel = "x", ylabel = "y", legend = false)
-
 savefig("grafico.png")
+
 =#
 exp = Mp - 10
 pk = 50
@@ -59,10 +59,17 @@ u0 = 0
 umax = pk
 k1 = (vmax -v0)/h
 k2 = (umax -v0)/h
-ma = 0
 TortStart = v0 - umax
 ma = 0
+max = 0
 min = tor_preciso(exp)
+
+using DecFP
+
+# Definição das variáveis em BigFloat
+L = big"1.0"
+Mp = big"100.0"
+rp = big"1.0"
 
 
 function tor_2(r_)
@@ -72,15 +79,20 @@ function tor_2(r_)
     return res
 end
 
-
-
-for i = 100:-2:2
-    ts1 = 10^i
-    if -tor_2(ts1) < h
-        global max = ts1
-        global ma = ma + 2
-    end
+function valor_atanh(x)
+    a = 1 / big(10)^x
+    y = atanh(a)
+    res = L^2 * (  - y/rp )
+    return res
 end
 
-println("ma:", ma)
-println("max:", max)
+
+for i = 100:-1:2
+    if -valor_atanh(i) < h 
+        global max = 10.0^i
+    else
+        global ma = ma + 2.0
+    end
+end
+println("\nma:", ma)
+println("\nmax: ", max)
