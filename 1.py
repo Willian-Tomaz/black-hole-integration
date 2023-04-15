@@ -8,8 +8,19 @@ def g (r, rp, L):
   
   return g
 
+def arctanh(x):
+  res = 0.5 * math.log( ( 1 + x ) / (1 - x)  )
+  return res
+
+def tor2(x):
+  eps = 10**(x)  # e.g. eps = 1e-240
+  res = -0.5 * math.log((2 + eps)/eps)
+  return res
+
 def tor(r):
-  tot = (L**2 * ( - ((mp.atanh(rp/r))) / rp   ))
+  if r < 0:
+    return tor2(r)
+  tot = (L**2 * ( - ((arctanh(rp/r))  ) / rp   ))
   return tot
 
 Mp = 250
@@ -28,7 +39,8 @@ ma = 0
 TortStart = v0 - umax
 k1 = (vmax-v0) / h
 k2 = (umax - u0) / h
-min = tor(rp+10**-exp)
+min = tor(-exp)
+print("min:", min)
 
 
 x= np.arange(rp,10 * rp,0.1)
@@ -39,11 +51,6 @@ for i in x:
 
 plt.plot(x, y)
  
-x = 240
-eps = 10**(-x)  # e.g. eps = 1e-240
-res = -0.5 * math.log((2 + eps)/eps)
-print(res)
-
 
 ts1 = 10**1
 ma = 0
@@ -53,4 +60,3 @@ while True:
     ma = ma + 2
     print("ma 1: ", ma)
     break
- 
