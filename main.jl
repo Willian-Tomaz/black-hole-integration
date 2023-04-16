@@ -1,5 +1,6 @@
 using Plots
 using Printf
+using DecFP
 
 Mp = 250
 L = 1
@@ -38,16 +39,14 @@ end
 x = range(rp, 10*rp, step=0.1)
 y = []
 
-#=
 
 for i in x
     a = tor(i)
     push!(y,a)
 end
 plot(x, y, origin = true, xlabel = "x", ylabel = "y", legend = false)
-savefig("grafico.png")
+savefig("grafico_1.png")
 
-=#
 exp = Mp - 10
 pk = 50
 h = 1/100
@@ -64,11 +63,9 @@ ma = 0
 max = 0
 min = tor_preciso(exp)
 
-using DecFP
-
-# Definição das variáveis em BigFloat
+ 
 L = big"1.0"
-Mp = big"100.0"
+Mp = big"250.0"
 rp = big"1.0"
 
 
@@ -94,5 +91,36 @@ for i = 100:-1:2
         global ma = ma + 2.0
     end
 end
-println("\nma:", ma)
-println("\nmax: ", max)
+println("ma:", ma)
+println("max: ", max)
+
+
+
+function find_root(f, a, b, precision)
+    oldm = a
+    n = a
+    p = b
+    m = (a + b)/2
+    g = 10^(-precision)
+    while abs(n - p) > g && oldm != m
+        oldm = m
+        val = f(m)
+        if val > 0
+            p = m
+        elseif val < 0
+            n = m
+        else
+            break
+        end
+        m = (n + p)/2
+    end
+    return m
+end
+
+tort = [find_root(r -> tor_2(r) - test, rp + 10.0^-exp, max, Mp) for test in ts:h:te]
+
+
+plot(tort)
+ylims!(0.999, 1.002)
+ 
+savefig("grafico_2.png")
