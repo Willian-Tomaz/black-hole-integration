@@ -1,6 +1,7 @@
 using Plots
 using Printf
 using DecFP
+using DelimitedFiles
 
 Mp = 250
 L = 1
@@ -45,7 +46,7 @@ for i in x
     push!(y,a)
 end
 plot(x, y, origin = true, xlabel = "x", ylabel = "y", legend = false)
-savefig("grafico_1.png")
+savefig("gráfico/grafico_1.png")
 
 exp = Mp - 10
 pk = 50
@@ -62,6 +63,7 @@ TortStart = v0 - umax
 ma = 0
 max = 0
 min = tor_preciso(exp)
+println("min: ", min)
 
  
 L = big"1.0"
@@ -95,7 +97,6 @@ println("ma:", ma)
 println("max: ", max)
 
 
-
 function find_root(f, a, b, precision)
     oldm = a
     n = a
@@ -117,10 +118,12 @@ function find_root(f, a, b, precision)
     return m
 end
 
-tort = [find_root(r -> tor_2(r) - test, rp + 10.0^-exp, max, Mp) for test in ts:h:te]
 
+@time tort = [find_root(r -> tor_2(r) - test, rp + 10.0^-exp, max, Mp) for test in ts:h:te]
 
+writedlm("Resultado_1/tort_julia.txt", tort)
+#Os resultados do tort, tanto em julia quanto em mathematica são os mesmos
+#Apenas o gráfico está plotado errado. 
 plot(tort)
 ylims!(0.999, 1.002)
- 
-savefig("grafico_2.png")
+savefig("gráfico/grafico_2.png")
