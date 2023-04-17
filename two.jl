@@ -1,7 +1,6 @@
 include("one.jl")
-using Plots
-using Printf
-using DecFP
+using Base
+
 
 ch = 0.0
 mu = 0.0
@@ -44,11 +43,10 @@ for i in x
 end
 
 plot(r -> V(r), rp, 10rp, xlabel="r", ylabel="V(r)", title="Gráfico de V(r)")
-savefig("gráfico_2/grafico_1.png")
+savefig("2_gráfico/grafico_4.png")
+@info "Gráfico 4 gerado"
 
 P = zeros(Float64, (Int((te-ts)/h) + 2, 1))
-
-
 P2 = zeros(Float64, (Int((te-ts)/h) + 2, 1))
 
 for i in 1:div(te - ts, h) + 1
@@ -57,7 +55,9 @@ for i in 1:div(te - ts, h) + 1
     P2[i] = P2a(tort[i])
 end
 
-s = zeros(Int, Int(div(te-ts,h))+6)
+s = zeros(Float64, Int(div(te-ts, h)) + 6)
+
+
 s[1] = 1 
 
 kpp = 0
@@ -69,39 +69,47 @@ len = length(P)
 kpp = 0
 seg = 400
 
-Fd = zeros(Int, Int(div(te-ts,h))+6)
-LFd = zeros(Int, Int(div(te-ts,h))+6)
+Fd = zeros(Float64, Int(div(te-ts,h))+6)
+LFd = zeros(Float64, Int(div(te-ts,h))+6)
 
-@time for i = 0:k2 + k1 - 3
-    var = s[1]
-    s[1] = 1
-    if trunc(Int, i/seg) == i/seg
-        println(i)
-    else
-        global kpp += 1
-    end
-    for j = 2:i+2
-        j = convert(Int, j)
-        tmp = s[j]
-        if j == i+2
-            s[j] = 0
+# Integration
+kpp = 0
+seg = 400
+
+
+
+
+t = @elapsed begin
+    for i in 0:k2 + k1 - 3
+        i = floor(Int, i)
+        var = s[1]
+        s[1] = 1
+    
+        if i % seg == 0
+            @info "$i"
         else
-            println("\naqui 1 ?\n")
-            s[j] = ((s[j-1] + s[j] - var*(1 - 2h*P2[j+k2+k1-i-2])) -
-                    2h^2*(P[j+k2+k1-i-3]*s[j-1] + P[j+k2+k1-i-1]*s[j]))/
-                    ((2h*P2[j+k1+k2-i-2] + 1))
-            println("\naqui 2 ?\n")        
-            s[j] = round(s[j], digits= 15 )  # arredonda o resultado para a precisão definida por Mp
+            global kpp += 1
         end
-        var = tmp
-        if j == i+2
-            if (s[j]) == 0
-                LFd[j-1] = 0 #editar
-            else
+    
+        for j in 2:i+2
+            j = floor(Int, j)
+            tmp = s[j]
+            if j == i+2
+                s[j] = 0
+                global k1 = floor(Int, k1)
+                global k2 = floor(Int, k2) 
+                s[j] = (s[j-1] + s[j] - var*(1 - 2*h*P2[j+k2+k1-i-2]) - 2*h^2*(P[j+k2+k1-i-3]*s[j-1] + P[j+k2+k1-i-1]*s[j]))*(2*h*P2[j+k1+k2-i-2] + 1)^-1
+            end
+    
+            var = tmp
+            if j == i+2
                 LFd[j-1] = log(s[j]^2)/2
                 Fd[j-1] = s[j]
-                global kpp += 1
+                kpp += 1
             end
         end
     end
 end
+t_for = round(t, digits=2)
+
+@info "Tempo de execução (for): $t_for s"

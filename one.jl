@@ -2,6 +2,7 @@ using Plots
 using Printf
 using DecFP
 using DelimitedFiles
+using Logging
 
 Mp = 250
 L = 1
@@ -18,7 +19,6 @@ function tor(r_)
     return res
 end
 
-
 function arctanh(x)
     if abs2(x) < 1
         res = log( ( 1 + x ) / (1 - x)  )
@@ -28,25 +28,23 @@ function arctanh(x)
     return 0.5*res
 end
  
-
-function tor_preciso(x)
+function tor_preciso(x) # atanh (1 + 10^⁻240)
     eps = 10.0^(-x)
     res = 0.5 * log(( 2 + eps )/eps)
     res2 = L^2 * (  - res/rp )
     return res2
 end
 
-
 x = range(rp, 10*rp, step=0.1)
 y = []
-
 
 for i in x
     a = tor(i)
     push!(y,a)
 end
 plot(x, y, origin = true, xlabel = "x", ylabel = "y", legend = false)
-savefig("gráfico_1/grafico_1.png")
+savefig("1_gráfico/grafico_1.png")
+@info "Gráfico 1 gerado"
 
 exp = Mp - 10
 pk = 50
@@ -58,13 +56,13 @@ vmax = 0
 u0 = 0
 umax = pk
 k1 = (vmax -v0)/h
-k2 = (umax -v0)/h
+k2 = (umax -u0)/h
 TortStart = v0 - umax
 ma = 0
 max = 0
 min = tor_preciso(exp)
-println("min: ", min)
-
+@info "Grid: $h"
+@info "Min: $min"
  
 L = big"1.0"
 Mp = big"250.0"
@@ -85,7 +83,6 @@ function valor_atanh(x)
     return res
 end
 
-
 for i = 100:-1:2
     if -valor_atanh(i) < h 
         global max = 10.0^i
@@ -93,9 +90,8 @@ for i = 100:-1:2
         global ma = ma + 2.0
     end
 end
-println("ma:", ma)
-println("max: ", max)
-
+@info "Ma: $ma"
+@info "Max: $max"
 
 function find_root(f, a, b, precision)
     oldm = a
@@ -118,12 +114,22 @@ function find_root(f, a, b, precision)
     return m
 end
 
+t = @elapsed begin
+    tort = [find_root(r -> tor_2(r) - test, rp + 10.0^-exp, max, Mp) for test in ts:h:te]
+end
+t_rounded = round(t, digits=2)
 
-@time tort = [find_root(r -> tor_2(r) - test, rp + 10.0^-exp, max, Mp) for test in ts:h:te]
+@info "Tempo de execução (tort): $t_rounded s"
 
 writedlm("Resultado_1/tort_julia.txt", tort)
-#Os resultados do tort, tanto em julia quanto em mathematica são os mesmos
-#Apenas o gráfico está plotado errado. 
 plot(tort)
-ylims!(0.999, 1.002)
-savefig("gráfico_1/grafico_2.png")
+ylims!(0.9999, 1.003)
+savefig("1_gráfico/grafico_2.png")
+@info "Gráfico 2 gerado"
+
+ucoord = [tor(tort[i]) for i in eachindex(tort)]
+plot(ucoord)
+hline!([0], lw=1, c=:black, ls=:dash)
+vline!([0], lw=1, c=:black, ls=:dash)  
+savefig("1_gráfico/grafico_3.png")
+@info "Gráfico 3 gerado"
