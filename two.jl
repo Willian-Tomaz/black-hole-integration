@@ -3,26 +3,9 @@ using Plots
 using Printf
 using DecFP
 
-Mp = 250
 ch = 0.0
 mu = 0.0
 kp = 0.0
-rp = 1.0
-L = 1.0
-exp = Mp - 10
-pk = 50.0
-h = 1.0/100.0
-ts = -2.0*pk
-te = -h
-v0 = -pk
-vmax = 0.0
-u0 = 0.0
-umax = pk
-k1 = (vmax -v0)/h
-k2 = (umax -v0)/h
-TortStart = v0 - umax
-ma = 0.0
-max = 0.0
 
 function phi_(r)
     phi = (rp*ch)/r^2
@@ -69,6 +52,56 @@ P = zeros(Float64, (Int((te-ts)/h) + 2, 1))
 P2 = zeros(Float64, (Int((te-ts)/h) + 2, 1))
 
 for i in 1:div(te - ts, h) + 1
-    P[i] = V[tort[i]]
-    end
+    i = convert(Int, i)
+    P[i] = V(tort[i])
+    P2[i] = P2a(tort[i])
+end
 
+s = zeros(Int, Int(div(te-ts,h))+6)
+s[1] = 1 
+
+kpp = 0
+seg = div(length(s), 10)
+len = length(P)
+
+#Integration
+
+kpp = 0
+seg = 400
+
+Fd = zeros(Int, Int(div(te-ts,h))+6)
+LFd = zeros(Int, Int(div(te-ts,h))+6)
+
+@time for i = 0:k2 + k1 - 3
+    var = s[1]
+    s[1] = 1
+    if trunc(Int, i/seg) == i/seg
+        println(i)
+    else
+        global kpp += 1
+    end
+    for j = 2:i+2
+        j = convert(Int, j)
+        tmp = s[j]
+        if j == i+2
+            s[j] = 0
+        else
+            println("\naqui 1 ?\n")
+            s[j] = ((s[j-1] + s[j] - var*(1 - 2h*P2[j+k2+k1-i-2])) -
+                    2h^2*(P[j+k2+k1-i-3]*s[j-1] + P[j+k2+k1-i-1]*s[j]))/
+                    ((2h*P2[j+k1+k2-i-2] + 1))
+            println("\naqui 2 ?\n")        
+            s[j] = round(s[j], digits= 15 )  # arredonda o resultado para a precisão definida por Mp
+        end
+        var = tmp
+        if j == i+2
+            if (s[j]) == 0
+                LFd[j-1] = 0 #editar
+            else
+                LFd[j-1] = log(s[j]^2)/2
+                Fd[j-1] = s[j]
+                global kpp += 1
+            end
+        end
+    end
+end

@@ -46,7 +46,7 @@ for i in x
     push!(y,a)
 end
 plot(x, y, origin = true, xlabel = "x", ylabel = "y", legend = false)
-savefig("gráfico/grafico_1.png")
+savefig("gráfico_1/grafico_1.png")
 
 exp = Mp - 10
 pk = 50
@@ -126,4 +126,4 @@ writedlm("Resultado_1/tort_julia.txt", tort)
 #Apenas o gráfico está plotado errado. 
 plot(tort)
 ylims!(0.999, 1.002)
-savefig("gráfico/grafico_2.png")
+savefig("gráfico_1/grafico_2.png")
