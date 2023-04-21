@@ -1,0 +1,16 @@
+Dados iniciais
+
+exp = Mp - 10
+pk = 50
+h = 1/10
+ts = -2*pk
+te = -h
+v0 = -pk
+vmax = 0
+u0 = 0
+umax = pk
+k1 = (vmax -v0)/h
+k2 = (umax -u0)/h
+TortStart = v0 - umax
+ma = 0
+max = 0

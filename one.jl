@@ -1,12 +1,17 @@
+include("log.jl")
 using Plots
 using Printf
 using DecFP
 using DelimitedFiles
 using Logging
 
-Mp = 250
-L = 1
-rp = 1
+using ArbNumerics, Readables
+
+setprecision(BigFloat, 800)
+
+Mp = big"250.0"
+L = big"1.0"
+rp = big"1.0"
 
 function g(r)
     g = ( r^2 - rp^2 ) / L^2
@@ -44,11 +49,10 @@ for i in x
 end
 plot(x, y, origin = true, xlabel = "x", ylabel = "y", legend = false)
 savefig("1_gráfico/grafico_1.png")
-@info "Gráfico 1 gerado"
 
 exp = Mp - 10
 pk = 50
-h = 1/100
+h = 1/1
 ts = -2*pk
 te = -h
 v0 = -pk
@@ -61,14 +65,7 @@ TortStart = v0 - umax
 ma = 0
 max = 0
 min = tor_preciso(exp)
-@info "Grid: $h"
-@info "Min: $min"
  
-L = big"1.0"
-Mp = big"250.0"
-rp = big"1.0"
-
-
 function tor_2(r_)
     a = rp / r_
     b = arctanh(BigFloat(a))
@@ -90,8 +87,8 @@ for i = 100:-1:2
         global ma = ma + 2.0
     end
 end
-@info "Ma: $ma"
-@info "Max: $max"
+
+data()
 
 function find_root(f, a, b, precision)
     oldm = a
@@ -121,15 +118,13 @@ t_rounded = round(t, digits=2)
 
 @info "Tempo de execução (tort): $t_rounded s"
 
-writedlm("Resultado_1/tort_julia.txt", tort)
+writedlm("log/tort_julia.txt", tort)
 plot(tort)
 ylims!(0.9999, 1.003)
 savefig("1_gráfico/grafico_2.png")
-@info "Gráfico 2 gerado"
 
 ucoord = [tor(tort[i]) for i in eachindex(tort)]
 plot(ucoord)
 hline!([0], lw=1, c=:black, ls=:dash)
 vline!([0], lw=1, c=:black, ls=:dash)  
 savefig("1_gráfico/grafico_3.png")
-@info "Gráfico 3 gerado"
