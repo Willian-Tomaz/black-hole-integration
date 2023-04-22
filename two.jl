@@ -1,9 +1,9 @@
 include("one.jl")
 using Base
 
-ch = big"0.0"
-mu = big"0.0"
-kp = big"0.0"
+ch = ArbFloat(0.0, digits=250, base=10)
+mu = ArbFloat(0.0, digits=250, base=10)
+kp = ArbFloat(0.0, digits=250, base=10)
 
 function phi_(r)
     phi = (rp*ch)/r^2
@@ -43,13 +43,12 @@ end
 plot(r -> V(r), rp, 10rp, xlabel="r", ylabel="V(r)", title="Gráfico de V(r)")
 savefig("2_gráfico/grafico_4.png")
 
-P = zeros(BigFloat, (Int((te-ts)/h) + 2, 1))
-P2 = zeros(Float64, (Int((te-ts)/h) + 2, 1))
-
+P = zeros(ArbFloat, (Int((te-ts)/h) + 2, 1))
+P2 = zeros(ArbComplex, (Int((te-ts)/h) + 2, 1))
 
 for i in 1:div(te - ts, h) + 1
     i = convert(Int, i)     
-    P[i] = big(V(tort[i]))
+    P[i] = ArbFloat(V(tort[i]))
     P2[i] = P2a(tort[i])
 end
 
@@ -57,45 +56,48 @@ end
 save_vec(P, "P_julia")
 save_vec(P2, "P2_julia")
 
-s = zeros(BigFloat, Int(div(te-ts, h)) + 6)
-@info "Comprimento s: $(length(s))"
-
-s[1] = big"1.0" 
-
-
-seg = div(length(s), 10)
-len = length(P)
-
-#Integration
 kpp = 0
 seg = 400
 
 Fd = zeros(BigFloat, Int(div(te-ts,h))+6)
 LFd = zeros(BigFloat, Int(div(te-ts,h))+6)
 
+
+s = zeros(ArbFloat, Int(div(te-ts, h)) + 6)
+@info "Comprimento s: $(length(s))"
+
+s[1] = ArbFloat(1.0, digits=250, base=10) 
+
+seg = div(length(s), 10)
+len = length(P)
+
+ 
+setprecision(BigFloat, 800)
 t = @elapsed begin
     for i in 0: k2 + k1 - 4
         i = floor(Int, i)
-        var = big(s[1])
+        var = s[1]
+        s[1] = 1.0
         
-        s[1] = big"1.0"
         if i % seg == 0
             @info "$i"
         end
 
         for j in 2:i+2
             j = floor(Int, j)
-            tmp = big(s[j])
-            
+            tmp = s[j]
             global k1 = floor(Int, k1)
-            global k2 = floor(Int, k2) 
-
-                 
-            s[j] = big(s[j-1] + s[j] - var * (1 - 2h*P2[j+k2+k1-i-2]) - (2h^2 * (P[j+k2+k1-i-3]*s[j-1] + P[j+k2+k1-i-1]*s[j]))) * ((2h*P2[j+k1+k2-i-2] + 1)^(-1))
-
+            global k2 = floor(Int, k2)
+            p1 = P[j+k2+k1-i-3]
+            p2 = P2[j+k2+k1-i-2]
+            p3 = P[j+k2+k1-i-1]
+            
+            s[j] = ArbFloat((s[j-1] + s[j] - var * (1 - 2h*p2) - 2h^2 * (p1*s[j-1] + p3*s[j])) * ((2h*p2 + 1)^(-1)), digits=250, base=10)
+            
             var = tmp
             LFd[j-1] = log(s[j]^2)/2
             Fd[j-1] = s[j]
+            
             if j == i+2
                 global kpp += 1
             end
@@ -103,7 +105,7 @@ t = @elapsed begin
     end
 end
 
-
+ 
 t_for = round(t, digits=2)
 @info "Tempo de execução (for): $t_for s"
 
@@ -126,4 +128,3 @@ save_vec(s, "s_julia")
 save_vec(LFd, "LFd_julia")
 save_vec(Fd, "Fd_julia")
 
- 

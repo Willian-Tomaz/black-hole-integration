@@ -4,14 +4,17 @@ using Printf
 using DecFP
 using DelimitedFiles
 using Logging
-
 using ArbNumerics, Readables
 
-setprecision(BigFloat, 800)
+#b = ArbFloat(1.00001, digits=100, base=10)
 
-Mp = big"250.0"
-L = big"1.0"
-rp = big"1.0"
+setprecision(BigFloat, 800)
+Mp = ArbFloat(250.0, digits=250, base=10)
+#Mp = big"250.0"
+L = ArbFloat(1.0, digits=250, base=10)
+#L = big"1.0"
+rp = ArbFloat(1.0, digits=250, base=10)
+#rp = big"1.0"
 
 function g(r)
     g = ( r^2 - rp^2 ) / L^2
