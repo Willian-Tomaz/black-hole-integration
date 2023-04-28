@@ -16,7 +16,7 @@ function data()
     @info "TortStart: $(TortStart)"
     @info "ma: $(ma)"
     @info "max: $(max)"
-    #@info "min: $(@sprintf("%.10f", min))"
+    @info "min: $(@sprintf("%.10f", min))"
 end
 
 
@@ -26,7 +26,7 @@ function save_vec(v, filename="")
         @warn "Precisa definir o nome do arquivo"
     else
 
-        filename = "log/$filename.txt"
+        filename = "logs/$filename.txt"
         writedlm(filename, v)
         @info "Vetor $a salvo"
     end
