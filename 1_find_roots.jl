@@ -1,4 +1,4 @@
-include("log.jl")
+include("logs.jl")
 using Plots
 using Printf
 using DecFP
@@ -6,13 +6,10 @@ using DelimitedFiles
 using Logging
 using PGFPlotsX
 using ArbNumerics, Readables
-
+using Serialization
 
 setprecision(BigFloat, 250; base=10)
 
-#Mp = BigFloat("250.0")
-#L = BigFloat("1.0")
-#rp = BigFloat("1.0")
 Mp = 250.0
 L = 1.0
 rp = 1
@@ -44,8 +41,7 @@ function valor_atanh(x)
     res = BigFloat(  L^2 * (- y/rp ))
     return res
 end
- 
- 
+ s
 function tor_preciso(x) # atanh (1 + 10^⁻240)
     eps = 10.0^(-x)
     res = 0.5 * BigFloat(log(( 2 + eps )/eps))
@@ -59,8 +55,8 @@ plot(x, y; xlabel="x", ylabel="y", legend=false, origin=true)
 savefig("1_gráfico/grafico_1.pdf")
 
 exp = Mp - 10
-pk = 40
-h = 1// 20
+pk = 50
+h = 1// 10
 ts = -2*pk
 te = -h
 v0 = -pk
@@ -74,7 +70,6 @@ ma = 0
 max = 0
 min = tor_preciso(exp)
  
-
 for i = 100:-1:2
     if -valor_atanh(i) < h 
         global max = 10.0^i
@@ -126,5 +121,3 @@ plot(ucoord, st=:scatter)
 hline!([0], lw=1, c=:black, ls=:dash)
 vline!([0], lw=1, c=:black, ls=:dash)  
 savefig("1_gráfico/grafico_3.pdf")
-
-save_vec(tort, "tort_julia")

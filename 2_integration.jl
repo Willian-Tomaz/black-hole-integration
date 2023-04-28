@@ -1,4 +1,4 @@
-include("one.jl")
+include("1_find_roots.jl")
 using Base
 
 setprecision(BigFloat, 250; base=10)
@@ -61,8 +61,8 @@ for i in 1:div(te - ts, h) + 1
 end
 
 
-save_vec(P, "P_julia")
-save_vec(P2, "P2_julia")
+#save_vec(P, "P_julia")
+#save_vec(P2, "P2_julia")
 
 kpp = 0
  
@@ -141,7 +141,15 @@ savefig("2_gráfico/grafico_6.pdf")
 @info "Comprimento P: $(length(P))"
 @info "Comprimento P2: $(length(P2))"
 
-save_vec(s, "s_julia")
+#save_vec(s, "s_julia")
 #save_vec(LFd, "LFd_julia")
 #save_vec(Fd, "Fd_julia")
 
+
+
+using Serialization
+
+# salvar o vetor em um arquivo
+open("logs/s.jls", "w") do io
+    serialize(io, s)
+end
