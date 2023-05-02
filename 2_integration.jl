@@ -1,19 +1,19 @@
 include("1_find_roots.jl")
 using Base
 
-setprecision(BigFloat, 250; base=10)
+setprecision(BigFloat, 300; base=10)
 
-Mp = BigFloat("250.0")
-L = BigFloat("1.0")
-rp = BigFloat("1.0")
+Mp = BigFloat(Mp)
+L = BigFloat(L)
+ 
 
 ch = big"0.0"
 mu = big"0.0"
-kp = big"0.0"
+kp = big"1.0"
 
 
 function phi_(r)
-    phi = big((rp*ch)/r^2)
+    phi = BigFloat((rp*ch)/r^2)
     return phi
 end
 
@@ -24,8 +24,8 @@ end
 
 function V(r)
     phi = phi_(r)
-    g = big((r^2 - rp^2) / L^2)
-    return big(g/4 * (-(g/(4r^2)) + derivada_g(r)/2r + kp^2/r^2 + mu^2) - phi^2/4)
+    g = BigFloat((r^2 - rp^2) / L^2)
+    return BigFloat(g/4 * (-(g/(4r^2)) + derivada_g(r)/2r + kp^2/r^2 + mu^2) - phi^2/4)
 end
 
 function P2a(r)
@@ -56,12 +56,17 @@ P2 = zeros(ArbComplex, (Int((te-ts)/h) + 2, 1))
 
 for i in 1:div(te - ts, h) + 1
     i = convert(Int, i)     
-    P[i] = big( V(tort[i])  )
+    P[i] = BigFloat( V(tort[i])  )
     P2[i] =  P2a(tort[i])
 end
 
+a = BigFloat("5.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000432127402815385523242057422000875031416523375748497720543393766142530234941384778046401762243242586402907208722588288882873132508207472020813530103221692155328192613329328545515420182537421466825631898350721991389748399092690619409923484309951542060077574271290822146184917666772647388")
 
-#save_vec(P, "P_julia")
+@info "V(): $(V(a))"
+plot(tort, st=:scatter)
+savefig("grafico.pdf")
+
+save_vec(P, "P_julia")
 #save_vec(P2, "P2_julia")
 
 kpp = 0
@@ -79,7 +84,7 @@ s[1] = big"1.0"
 seg = div(length(s), 10)
 len = length(P)
 
-#seg = 400
+seg = 400
  
 t = @elapsed begin
     map(i -> begin
@@ -153,3 +158,10 @@ using Serialization
 open("logs/s.jls", "w") do io
     serialize(io, s)
 end
+
+
+#save_vec(s, "s")
+#save_vec(P, "P")
+
+#simplificar a vida:
+include("3_qn_values.jl")
