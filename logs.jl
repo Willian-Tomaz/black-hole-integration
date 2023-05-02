@@ -1,22 +1,25 @@
 using Printf
 
 function data()
-    @info "Mp: $(Mp)"
-    @info "L: $(L)"
-    @info "rp: $(rp)"
-    @info "exp: $(exp)"
-    @info "pk: $(pk)"
-    @info "grid: $(h)"
-    @info "ts: $(ts)"
-    @info "te: $(te)"
-    @info "v0: $(v0)"
-    @info "vmax: $(vmax)"
-    @info "k1: $(k1)"
-    @info "k2: $(k2)"
-    @info "TortStart: $(TortStart)"
-    @info "ma: $(ma)"
-    @info "max: $(max)"
-    @info "min: $(@sprintf("%.10f", min))"
+    for item in ["Mp: $(Mp)", 
+                 "L: $(L)", 
+                 "rp: $(rp)", 
+                 "exp: $(exp)", 
+                 "pk: $(pk)", 
+                 "grid: $(h)", 
+                 "ts: $(ts)", 
+                 "te: $(te)", 
+                 "v0: $(v0)", 
+                 "vmax: $(vmax)", 
+                 "k1: $(k1)", 
+                 "k2: $(k2)", 
+                 "TortStart: $(TortStart)", 
+                 "ma: $(ma)", 
+                 "max: $(max)", 
+                 "min: $(@sprintf("%.10f", min))"]
+        @info item
+        sleep(0.3)
+    end
 end
 
 

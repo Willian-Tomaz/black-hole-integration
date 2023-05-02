@@ -8,11 +8,11 @@ using PGFPlotsX
 using ArbNumerics, Readables
 using Serialization
 
-setprecision(BigFloat, 250; base=10)
+setprecision(BigFloat, 500; base=10)
 
 Mp = 250.0
 L = 1.0
-rp = 1
+rp = 5
 
 function g(r)
     g = BigFloat(( r^2 - rp^2 ) / L^2)
@@ -29,9 +29,10 @@ function arctanh(x)
 end
 
 function tor_2(r)
+ 
     a = BigFloat( rp / r )
     b = BigFloat(arctanh(a))
-    res = BigFloat(L^2 * (-b / rp))
+    res = BigFloat(L^2 * (- b /  BigFloat(rp)))
     return res
 end
 
@@ -41,11 +42,12 @@ function valor_atanh(x)
     res = BigFloat(  L^2 * (- y/rp ))
     return res
 end
- s
+
 function tor_preciso(x) # atanh (1 + 10^⁻240)
     eps = 10.0^(-x)
     res = 0.5 * BigFloat(log(( 2 + eps )/eps))
-    res2 = big(L^2 * (  - res/rp ))
+    a = BigFloat(rp)
+    res2 = BigFloat(L^2 * (  - res/a ))
     return res2
 end
 
@@ -56,7 +58,7 @@ savefig("1_gráfico/grafico_1.pdf")
 
 exp = Mp - 10
 pk = 50
-h = 1// 10
+h = 1//20
 ts = -2*pk
 te = -h
 v0 = -pk
@@ -111,7 +113,7 @@ t_rounded = round(t, digits=2)
 
 @info "Tempo de execução (tort): $t_rounded s"
 
-plot(tort, st=:scatter, ylim=(0.9999, 1.003))
+plot(tort, st=:scatter)
 savefig("1_gráfico/grafico_2.pdf")
 
 
@@ -121,3 +123,5 @@ plot(ucoord, st=:scatter)
 hline!([0], lw=1, c=:black, ls=:dash)
 vline!([0], lw=1, c=:black, ls=:dash)  
 savefig("1_gráfico/grafico_3.pdf")
+
+save_vec(tort, "tort")
