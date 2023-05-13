@@ -1,13 +1,15 @@
+include("dados.jl")
 using Serialization
 using Printf
  
 s = open("logs/s.jls", "r") do io
     deserialize(io)
 end
+size = length(s) - 5
 
-h = 1 // 20 # definir h novamente
-a1 = 500 # ponto inicial
-a2 = 1500 # ponto final
+a1 = Int((2*size)/10) # ponto inicial
+a2 = Int((8*size)/10) # ponto final
+
 Nn = a2 - a1 + 1
 
 Fii = zeros(BigFloat, Nn+1)

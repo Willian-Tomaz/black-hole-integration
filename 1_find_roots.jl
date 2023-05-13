@@ -1,18 +1,7 @@
 include("logs.jl")
-using Plots
-using Printf
-using DecFP
-using DelimitedFiles
-using Logging
-using PGFPlotsX
-using ArbNumerics, Readables
-using Serialization
+include("dados.jl")
 
-setprecision(BigFloat, 500; base=10)
-
-Mp = 250.0
-L = 1.0
-rp = 5
+setprecision(BigFloat, 250; base=10)
 
 function g(r)
     g = BigFloat(( r^2 - rp^2 ) / L^2)
@@ -54,22 +43,8 @@ end
 x = range(rp, 10rp, step=0.1)
 y = [tor_2(i) for i in x]
 plot(x, y; xlabel="x", ylabel="y", legend=false, origin=true)
-savefig("1_gráfico/grafico_1.pdf")
+savefig("graficos/grafico_1.pdf")
 
-exp = Mp - 10
-pk = 50
-h = 1//20
-ts = -2*pk
-te = -h
-v0 = -pk
-vmax = 0
-u0 = 0
-umax = pk
-k1 = (vmax -v0)//h
-k2 = (umax -u0)//h
-TortStart = v0 - umax
-ma = 0
-max = 0
 min = tor_preciso(exp)
  
 for i = 100:-1:2
@@ -99,29 +74,27 @@ function find_root(f, a, b, precision)
         else
             break
         end
-        m = (n + p) / BigFloat(2.0)
+        m = BigFloat(n + p) / BigFloat(2.0)
     end
     return m
  
 end
 
-t = @elapsed begin
-    tort = [find_root(r -> tor_2(r) - test, rp + 10.0^-exp, max, Mp) for test in ts:h:te]
-end
 
-t_rounded = round(t, digits=2)
-
-@info "Tempo de execução (tort): $t_rounded s"
+tort = @showprogress 1 "Calculating roots" [find_root(r -> tor_2(r) - test, rp + 10.0^-exp, max, Mp) for test in ts:h:te]
 
 plot(tort, st=:scatter)
-savefig("1_gráfico/grafico_2.pdf")
-
+savefig("graficos/grafico_2.pdf")
 
 ucoord = [tor_2(tort[i]) for i in eachindex(tort)]
  
 plot(ucoord, st=:scatter)
 hline!([0], lw=1, c=:black, ls=:dash)
 vline!([0], lw=1, c=:black, ls=:dash)  
-savefig("1_gráfico/grafico_3.pdf")
+savefig("graficos/grafico_3.pdf")
 
 save_vec(tort, "tort")
+
+open("logs/tort.jls", "w") do io
+    serialize(io, tort)
+end

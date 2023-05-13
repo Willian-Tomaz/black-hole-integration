@@ -18,7 +18,7 @@ function data()
                  "max: $(max)", 
                  "min: $(@sprintf("%.10f", min))"]
         @info item
-        sleep(0.3)
+        sleep(0.1)
     end
 end
 
