@@ -11,7 +11,7 @@ setprecision(BigFloat, 250; base=10)
 
 Mp = BigFloat("250.0")
 L = BigFloat("1.0")
-rp = 5
+rp = 1
 
 exp = Mp - 10
 pk = 40
@@ -30,4 +30,4 @@ max = 0
 
 ch = big"0.0"
 mu = big"0.0"
-kp = big"0.0"
+kp = big"2.0"

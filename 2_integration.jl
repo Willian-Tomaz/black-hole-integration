@@ -47,7 +47,6 @@ end
 
 plot(r -> V(r), rp, 10rp, xlabel="r", ylabel="V(r)", title="Gráfico de V(r)")
 savefig("graficos/grafico_4.pdf")
-#savefig("Teste/kp_0/1.pdf")
 
 P = zeros(BigFloat, (Int((te-ts)/h) + 2, 1))
 P2 = zeros(ArbComplex, (Int((te-ts)/h) + 2, 1))
@@ -60,21 +59,16 @@ end
 
 save_vec(P, "P")
 
-
-kpp = 0
-
 Fd = zeros(BigFloat, Int(div(te-ts,h))+6)
 LFd = zeros(BigFloat, Int(div(te-ts,h))+6)
 s = zeros(BigFloat, Int(div(te-ts, h)) + 6)
 
-
 s[1] = big"1.0" 
 
-seg = div(length(s), 10)
 len = length(P)
 
-seg = 400
- 
+kpp = 0
+
 @showprogress 1 "Calculating s" for i = 1:k2 + k1 - 4
     i = Int(i)
     var = s[1]
@@ -111,8 +105,6 @@ v1 = length(LFd)
 
 plot(real(LFd[1:v1]))
 savefig("graficos/grafico_5.pdf")
-#savefig("Teste/kp_0/2.pdf")
-
 
 scatter(1:v1, real(LFd[1:v1]), marker=:circle, markersize=2, color=:black,
         xlabel="Índice", ylabel="Valor de LFd", title="Gráfico de LFd")
